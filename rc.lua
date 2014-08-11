@@ -50,6 +50,7 @@ end
 
 run_once("urxvtd")
 run_once("unclutter")
+run_once("compton -b --config ~/.config/compton.conf")
 -- }}}
 
 -- {{{ Variable definitions
@@ -752,5 +753,3 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
       end)
 end
 -- }}}
-
-awful.util.spawn_with_shell("compton -b -config ~/.config/compton.conf")
