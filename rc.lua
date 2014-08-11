@@ -140,14 +140,6 @@ for s = 1, screen.count() do
 end
 -- }}}
 
--- {{{ Wallpaper
-if beautiful.wallpaper then
-    for s = 1, screen.count() do
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
-    end
-end
--- }}}
-
 -- {{{ Freedesktop Menu
 require("freedesktop/freedesktop")
 -- }}}
