@@ -38,19 +38,19 @@ do
 end
 -- }}}
 
--- {{{ Autostart applications
+-- {{{ autostart applications
 function run_once(cmd)
   findme = cmd
   firstspace = cmd:find(" ")
   if firstspace then
      findme = cmd:sub(0, firstspace-1)
   end
-  awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+  awful.util.spawn_with_shell("pgrep -u $user -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
 
 run_once("urxvtd")
 run_once("unclutter")
-run_once("compton -b --config ~/.config/compton.conf")
+run_once("compton -b  --config ~/.config/compton.conf")
 -- }}}
 
 -- {{{ Variable definitions
@@ -113,18 +113,22 @@ editor     = os.getenv("EDITOR") or "vim" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
 -- user defined
-browser    = "chromium"
+browser    = "google-chrome-stable"
 gui_editor = "gvim"
 graphics   = "gimp"
 mail       = terminal .. " -e mutt "
 
+-- define a useless gap
+beautiful.useless_gap_width = 15;
+
 local layouts = {
     awful.layout.suit.floating,
     awful.layout.suit.tile,
+    lain.layout.uselesstile,
     awful.layout.suit.tile.left,
+    lain.layout.uselesstile.left,
     awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
+    lain.layout.uselesstile.bottom,
     awful.layout.suit.fair.horizontal,
 }
 -- }}}
@@ -132,7 +136,7 @@ local layouts = {
 -- {{{ Tags
 tags = {
    names = { "web", "term", "docs", "media", "files", "other" },
-   layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7], layouts[1] }
+   layout = { layouts[3], layouts[4], layouts[1], layouts[1], layouts[1], layouts[1] }
 }
 for s = 1, screen.count() do
 -- Each screen has its own tag table.
