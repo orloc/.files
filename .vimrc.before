@@ -52,7 +52,7 @@
     "   let g:spf13_keep_trailing_whitespace = 1
 
     " Enable powerline symbols
-       let g:airline_powerline_fonts = 1
+    "   let g:airline_powerline_fonts = 1
 
     " vim files directory
     "   let g:spf13_consolidated_directory = <full path to desired directory>
@@ -77,7 +77,7 @@
 
     " Leave the default font and size in GVim
     " To set your own font, do it from ~/.vimrc.local
-    "   let g:spf13_no_big_font = 1
+       let g:spf13_no_big_font = 1
 
     " Disable  omni complete
     "   let g:spf13_no_omni_complete = 1
