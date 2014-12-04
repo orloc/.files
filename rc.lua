@@ -67,7 +67,7 @@ function scandir(directory, filter)
     if not filter then 
         filter = function(s) return true end
     end
-    print(filter)
+
     for filename in popen('ls -a "'.. directory ..'"'):lines() do 
         if filter(filename) then
             i = i+1
@@ -205,6 +205,7 @@ cpuwidget = lain.widgets.cpu({
 })
 
 -- Coretemp
+--[[
 tempicon = wibox.widget.imagebox(beautiful.widget_temp)
 tempwidget = lain.widgets.temp({
     settings = function()
@@ -224,6 +225,7 @@ batwidget = lain.widgets.bat({
         widget:set_text(bat_now.perc)
     end
 })
+]]
 
 -- ALSA volume
 volicon = wibox.widget.imagebox(beautiful.widget_vol)
@@ -388,8 +390,8 @@ for s = 1, screen.count() do
     right_layout:add(fswidget)
     right_layout:add(weathericon)
     right_layout:add(yawn.widget)
-    right_layout:add(tempicon)
-    right_layout:add(tempwidget)
+    --right_layout:add(tempicon)
+   -- right_layout:add(tempwidget)
 --    right_layout:add(baticon)
 --    right_layout:add(batwidget)
     right_layout:add(clockicon)

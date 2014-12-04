@@ -17,7 +17,9 @@ Plugin 'nanotech/jellybeans.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/syntastic'
 Plugin 'Lokaltog/vim-powerline'
-Plugin 'joonty/vim-phpqa.git'
+"Plugin 'joonty/vim-phpqa.git'
+Plugin 'evidens/vim-twig'
+Plugin 'AutoClose'
 Plugin 'jewes/Conque-Shell'
 " ================================================
 " All of your Plugins must be added before the following line
@@ -80,9 +82,8 @@ noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 
-autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml,perl autocmd BufWritePre <buffer> if !exists('g:spf13_keep_trailing_whitespace') | call StripTrailingWhitespace() | endif
 "autocmd FileType go autocmd BufWritePre <buffer> Fmt
-autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
+"autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
 
 "
 " Fugitive {
@@ -99,13 +100,5 @@ autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
         " Mnemonic _i_nteractive
         nnoremap <silent> <leader>gi :Git add -p %<CR>
         nnoremap <silent> <leader>gg :SignifyToggle<CR>
-    endif
-"}
-
-" PHPQA {
-    if isdirectory(expand("~/.vim/bundle/vim-fugitive/"))
-        let g:phpqa_messdetector_autorun = 0
-        let g:phpqa_codesniffer_autorun = 0
-        let g:phpqa_codecoverage_autorun = 1
     endif
 "}
