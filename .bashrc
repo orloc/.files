@@ -14,9 +14,8 @@ EDITOR='/usr/bin/vim'
 VISUAL='/usr/bin/gvim'
 BROWSER='/usr/bin/chromium'
 
-JAVA_HOME='/usr/java/jdk.1.7.updateNo'
 
-PATH="${PATH}:/home/orloc/bin:$(ruby -e 'puts Gem.user_dir')/bin:/usr/bin/vendor_perl"
+PATH="${PATH}:/home/orloc/bin:$(ruby -e 'puts Gem.user_dir')/bin:/usr/bin/vendor_perl:"
 
 source ~/.profile
 
@@ -62,3 +61,13 @@ PROMPT_COMMAND='set_prompt'
 function search(){ 
     aura -Ss $1; aura -As $1;
 }
+set +fp ~/.config/fontconfig/conf.d/ 
+
+[[ "$PS1" ]] && echo -e "\e[00;33m$(/usr/bin/fortune)\e[00m"
+
+alias ll='ls -larh'
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+eval $(ssh-agent)
+ssh-add
