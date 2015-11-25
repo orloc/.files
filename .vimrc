@@ -17,15 +17,26 @@ Plugin 'nanotech/jellybeans.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/syntastic'
 Plugin 'Lokaltog/vim-powerline'
+Plugin 'groenewege/vim-less'
+Plugin 'fatih/vim-go'
+Plugin 'tobyS/pdv'
+Plugin 'nsf/gocode', {'rtp': 'vim/'}
+Plugin 'tobyS/vmustache'
+Plugin 'ervandew/supertab'
+ Plugin 'shawncplus/phpcomplete.vim'
+Plugin 'wookiehangover/jshint.vim'
+Plugin 'sophacles/vim-processing'
 "Plugin 'joonty/vim-phpqa.git'
 Plugin 'evidens/vim-twig'
-Plugin 'AutoClose'
+Plugin 'HTML-AutoCloseTag'
 Plugin 'jewes/Conque-Shell'
 " ================================================
 " All of your Plugins must be added before the following line
 call vundle#end()               " required
 filetype plugin indent on       " required
 syntax on                       " Syntax highlighting
+
+au BufRead,BufNewFile *.ks set filetype=kos
 
 " General Vim Settings
 scriptencoding utf-8
@@ -41,7 +52,6 @@ set laststatus=2                " hide mode so it shows on the statusbar only
 set noshowmode                  " short ttimeoutlen to lower latency to show current mode
 set ttimeoutlen=50              " Highlight current line
 set cursorline
-set omnifunc=syntaxcomplete#Complete
 set backspace=2                 " Consistent backspace on all systems
 set smartindent
 set autoindent
@@ -61,6 +71,19 @@ set smartcase
 set hlsearch
 set incsearch
 
+let JSHintUpdateWriteOnly=1
+
+set omnifunc=syntaxcomplete#Complete
+let OmniCpp_GlobalScopeSearch = 1
+let OmniCpp_NamespaceSearch = 2
+
+let g:SuperTabDefaultCompletionType = "context"
+" Some popup menu overirdes
+highlight Pmenu ctermbg=13 guibg=LightGray
+highlight PmenuSel ctermbg=7 guibg=DarkBlue guifg=White
+highlight PmenuSbar ctermbg=7 guibg=DarkGray
+highlight PmenuThumb guibg=Black
+
 inoremap jj <ESC>               
 
 nnoremap gt gt<CR>:redraw!<CR>
@@ -76,29 +99,50 @@ noremap k gk
 noremap j gj
 noremap gk k
 noremap gj j
+
 " Ctrl-<hjkl> to move windows
 noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 
+map + <c-w>+
+map - <c-w>-
+map <c-n> <c-w><
+map <c-m> <c-w>>
+
+set splitbelow
+set splitright
+
 "autocmd FileType go autocmd BufWritePre <buffer> Fmt
 "autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
 
+let g:closetag_html_style=1
 "
 " Fugitive {
-    if isdirectory(expand("~/.vim/bundle/vim-fugitive/"))
-        nnoremap <silent> <leader>gs :Gstatus<CR>
-        nnoremap <silent> <leader>gd :Gdiff<CR>
-        nnoremap <silent> <leader>gc :Gcommit<CR>
-        nnoremap <silent> <leader>gb :Gblame<CR>
-        nnoremap <silent> <leader>gl :Glog<CR>
-        nnoremap <silent> <leader>gp :Git push<CR>
-        nnoremap <silent> <leader>gr :Gread<CR>
-        nnoremap <silent> <leader>gw :Gwrite<CR>
-        nnoremap <silent> <leader>ge :Gedit<CR>
-        " Mnemonic _i_nteractive
-        nnoremap <silent> <leader>gi :Git add -p %<CR>
-        nnoremap <silent> <leader>gg :SignifyToggle<CR>
-    endif
+nnoremap <silent> <leader>gs :Gstatus<CR>
+nnoremap <silent> <leader>gd :Gdiff<CR>
+nnoremap <silent> <leader>gc :Gcommit<CR>
+nnoremap <silent> <leader>gb :Gblame<CR>
+nnoremap <silent> <leader>gl :Glog<CR>
+nnoremap <silent> <leader>gp :Git push<CR>
+nnoremap <silent> <leader>gr :Gread<CR>
+nnoremap <silent> <leader>gw :Gwrite<CR>
+nnoremap <silent> <leader>ge :Gedit<CR>
+" Mnemonic _i_nteractive
+nnoremap <silent> <leader>gi :Git add -p %<CR>
+nnoremap <silent> <leader>gg :SignifyToggle<CR>
 "}
+
+" run a file through php CLI 
+:autocmd FileType php noremap <C-M> :w!<CR>:!/usr/bin/php %<CR>
+
+" linter
+:autocmd FileType php noremap <C-L> :!/usr/bin/php -l %<CR>
+
+"PDV
+let g:pdv_template_dir = $HOME ."/.vim/bundle/pdv/templates"
+nnoremap <buffer> <C-p> :call pdv#DocumentCurrentLine()<CR>
+
+"NERDTREE
+let NERDTreeShowHidden=1
