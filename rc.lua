@@ -9,7 +9,7 @@
 local gears     = require("gears")
 local awful     = require("awful")
 awful.rules     = require("awful.rules")
-require("awful.autofocus")
+                  require("awful.autofocus")
 local wibox     = require("wibox")
 local beautiful = require("beautiful")
 local naughty   = require("naughty")
@@ -38,19 +38,19 @@ do
 end
 -- }}}
 
--- {{{ autostart applications
+-- {{{ Autostart applications
 function run_once(cmd)
   findme = cmd
   firstspace = cmd:find(" ")
   if firstspace then
      findme = cmd:sub(0, firstspace-1)
   end
-  awful.util.spawn_with_shell("pgrep -u $user -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+  awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
 
 run_once("urxvtd")
 run_once("unclutter")
-run_once("compton -b  --config ~/.config/compton.conf")
+-- run_once("compton -b --config ~/.config/compton.conf")
 -- }}}
 
 -- {{{ Variable definitions
@@ -60,15 +60,15 @@ os.setlocale(os.getenv("LANG"))
 -- beautiful init
 beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/multicolor/theme.lua")
 
--- {{{ Random background images
-
-function scandir(directory, filter) 
+-- {{{ Random wallpaper
+--
+function scandir(directory, filter)
     local i, t, popen = 0, {}, io.popen
-    if not filter then 
+    if not filter then
         filter = function(s) return true end
     end
 
-    for filename in popen('ls -a "'.. directory ..'"'):lines() do 
+    for filename in popen('ls -a "' .. directory ..'"'):lines() do 
         if filter(filename) then
             i = i+1
             t[i] = filename
@@ -80,63 +80,58 @@ end
 wp_index = 1
 wp_timeout = 60
 wp_path = os.getenv("HOME") .. "/wallpapers/"
-wp_filter = function(s) return string.match(s, "%.jpg$") or string.match(s,"%.png$") end
+wp_filter = function(s) return string.match(s, '%.jpg$') or string.match(s, '%.png$') end
+
 wp_files = scandir(wp_path, wp_filter)
--- setup the timer
+
 wp_timer = timer { timeout = wp_timeout }
 wp_timer:connect_signal("timeout", function()
-    -- set wallpaper to current index for all screens
-    for s = 1, screen.count() do
+    for s = 1, screen.count() do 
         gears.wallpaper.maximized(wp_path .. wp_files[wp_index], s, true)
     end
-
-    -- stop the timer (we don't need multiple instances running at the same time)
     wp_timer:stop()
+    wp_index = math.random(1, #wp_files)
 
-    -- get next random index
-    wp_index = math.random( 1, #wp_files)
-
-    --restart the timer
     wp_timer.timeout = wp_timeout
     wp_timer:start()
 end)
 
 wp_timer:start()
 
--- }}}
+-- }}
 
 -- common
 modkey     = "Mod4"
 altkey     = "Mod1"
 terminal   = "xterm"
-editor     = os.getenv("EDITOR") or "vim" or "vi"
+editor     = os.getenv("EDITOR") or "nano" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
 -- user defined
-browser    = "google-chrome-stable"
+browser    = "chromium"
+browser2   = "iron"
 gui_editor = "gvim"
 graphics   = "gimp"
 mail       = terminal .. " -e mutt "
 
--- define a useless gap
-beautiful.useless_gap_width = 15;
-
 local layouts = {
     awful.layout.suit.floating,
     awful.layout.suit.tile,
-    lain.layout.uselesstile,
     awful.layout.suit.tile.left,
-    lain.layout.uselesstile.left,
     awful.layout.suit.tile.bottom,
-    lain.layout.uselesstile.bottom,
+    awful.layout.suit.tile.top,
+    awful.layout.suit.fair,
     awful.layout.suit.fair.horizontal,
+    awful.layout.suit.spiral,
+    awful.layout.suit.spiral.dwindle,
+    awful.layout.suit.max,
 }
 -- }}}
 
 -- {{{ Tags
 tags = {
    names = { "web", "term", "docs", "media", "files", "other" },
-   layout = { layouts[3], layouts[4], layouts[1], layouts[1], layouts[1], layouts[1] }
+   layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7], layouts[1] }
 }
 for s = 1, screen.count() do
 -- Each screen has its own tag table.
@@ -144,8 +139,17 @@ for s = 1, screen.count() do
 end
 -- }}}
 
+-- {{{ Wallpaper
+if beautiful.wallpaper then
+    for s = 1, screen.count() do
+        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+    end
+end
+-- }}}
+
 -- {{{ Freedesktop Menu
-require("freedesktop/freedesktop")
+mymainmenu = awful.menu.new({ items = require("menugen").build_menu(),
+                              theme = { height = 16, width = 130 }})
 -- }}}
 
 -- {{{ Wibox
@@ -205,7 +209,6 @@ cpuwidget = lain.widgets.cpu({
 })
 
 -- Coretemp
---[[
 tempicon = wibox.widget.imagebox(beautiful.widget_temp)
 tempwidget = lain.widgets.temp({
     settings = function()
@@ -225,7 +228,6 @@ batwidget = lain.widgets.bat({
         widget:set_text(bat_now.perc)
     end
 })
-]]
 
 -- ALSA volume
 volicon = wibox.widget.imagebox(beautiful.widget_vol)
@@ -234,11 +236,12 @@ volumewidget = lain.widgets.alsa({
         if volume_now.status == "off" then
             volume_now.level = volume_now.level .. "M"
         end
+
         widget:set_markup(markup("#7493d2", volume_now.level .. "% "))
     end
 })
 
--- Net 
+-- Net
 netdownicon = wibox.widget.imagebox(beautiful.widget_netdown)
 --netdownicon.align = "middle"
 netdowninfo = wibox.widget.textbox()
@@ -246,6 +249,12 @@ netupicon = wibox.widget.imagebox(beautiful.widget_netup)
 --netupicon.align = "middle"
 netupinfo = lain.widgets.net({
     settings = function()
+        if iface ~= "network off" and
+           string.match(yawn.widget._layout.text, "N/A")
+        then
+            yawn.fetch_weather()
+        end
+
         widget:set_markup(markup("#e54c62", net_now.sent .. " "))
         netdowninfo:set_markup(markup("#87af5f", net_now.received .. " "))
     end
@@ -341,11 +350,11 @@ mytasklist.buttons = awful.util.table.join(
                                           end))
 
 for s = 1, screen.count() do
-    
+
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
 
-    
+
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
     mylayoutbox[s]:buttons(awful.util.table.join(
@@ -361,9 +370,9 @@ for s = 1, screen.count() do
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
     -- Create the upper wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 20 }) 
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 20 })
     --border_width = 0, height =  20 })
-        
+
     -- Widgets that are aligned to the upper left
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mytaglist[s])
@@ -390,10 +399,10 @@ for s = 1, screen.count() do
     right_layout:add(fswidget)
     right_layout:add(weathericon)
     right_layout:add(yawn.widget)
-    --right_layout:add(tempicon)
-   -- right_layout:add(tempwidget)
---    right_layout:add(baticon)
---    right_layout:add(batwidget)
+    right_layout:add(tempicon)
+    right_layout:add(tempwidget)
+    right_layout:add(baticon)
+    right_layout:add(batwidget)
     right_layout:add(clockicon)
     right_layout:add(mytextclock)
 
@@ -402,20 +411,20 @@ for s = 1, screen.count() do
     layout:set_left(left_layout)
     --layout:set_middle(mytasklist[s])
     layout:set_right(right_layout)
-    
+
     mywibox[s]:set_widget(layout)
 
     -- Create the bottom wibox
     mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 20 })
     --mybottomwibox[s].visible = false
-            
+
     -- Widgets that are aligned to the bottom left
     bottom_left_layout = wibox.layout.fixed.horizontal()
-                        
+
     -- Widgets that are aligned to the bottom right
     bottom_right_layout = wibox.layout.fixed.horizontal()
     bottom_right_layout:add(mylayoutbox[s])
-                                            
+
     -- Now bring it all together (with the tasklist in the middle)
     bottom_layout = wibox.layout.align.horizontal()
     bottom_layout:set_left(bottom_left_layout)
@@ -488,6 +497,11 @@ globalkeys = awful.util.table.join(
             mymainmenu:show({ keygrabber = true })
         end),
 
+    -- Switch monitors
+     awful.key({modkey,            }, "F1",     function () awful.screen.focus(2) end),
+     awful.key({modkey,            }, "F2",     function () awful.screen.focus(1) end),
+     awful.key({modkey,            }, "F3",     function () awful.screen.focus(3) end),
+
     -- Show/Hide Wibox
     awful.key({ modkey }, "b", function ()
         mywibox[mouse.screen].visible = not mywibox[mouse.screen].visible
@@ -555,22 +569,22 @@ globalkeys = awful.util.table.join(
     -- MPD control
     awful.key({ altkey, "Control" }, "Up",
         function ()
-            awful.util.spawn_with_shell("mpc toggle || ncmpcpp toggle || ncmpc toggle || pms toggle")
+            awful.util.spawn_with_shell("mpc toggle || ncmpc toggle || pms toggle")
             mpdwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Down",
         function ()
-            awful.util.spawn_with_shell("mpc stop || ncmpcpp stop || ncmpc stop || pms stop")
+            awful.util.spawn_with_shell("mpc stop || ncmpc stop || pms stop")
             mpdwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Left",
         function ()
-            awful.util.spawn_with_shell("mpc prev || ncmpcpp prev || ncmpc prev || pms prev")
+            awful.util.spawn_with_shell("mpc prev || ncmpc prev || pms prev")
             mpdwidget.update()
         end),
     awful.key({ altkey, "Control" }, "Right",
         function ()
-            awful.util.spawn_with_shell("mpc next || ncmpcpp next || ncmpc next || pms next")
+            awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
             mpdwidget.update()
         end),
 
@@ -695,9 +709,9 @@ awful.rules.rules = {
 -- }}}
 
 -- {{{ Signals
--- Signal function to execute when a new client appears.
+-- signal function to execute when a new client appears.
 client.connect_signal("manage", function (c, startup)
-    -- Enable sloppy focus
+    -- enable sloppy focus
     c:connect_signal("mouse::enter", function(c)
         if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
             and awful.client.focus.filter(c) then
@@ -710,16 +724,53 @@ client.connect_signal("manage", function (c, startup)
         awful.placement.no_overlap(c)
         awful.placement.no_offscreen(c)
     end
+
+    local titlebars_enabled = false
+    if titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
+        -- buttons for the titlebar
+        local buttons = awful.util.table.join(
+                awful.button({ }, 1, function()
+                    client.focus = c
+                    c:raise()
+                    awful.mouse.client.move(c)
+                end),
+                awful.button({ }, 3, function()
+                    client.focus = c
+                    c:raise()
+                    awful.mouse.client.resize(c)
+                end)
+                )
+
+        -- widgets that are aligned to the right
+        local right_layout = wibox.layout.fixed.horizontal()
+        right_layout:add(awful.titlebar.widget.floatingbutton(c))
+        right_layout:add(awful.titlebar.widget.maximizedbutton(c))
+        right_layout:add(awful.titlebar.widget.stickybutton(c))
+        right_layout:add(awful.titlebar.widget.ontopbutton(c))
+        right_layout:add(awful.titlebar.widget.closebutton(c))
+
+        -- the title goes in the middle
+        local middle_layout = wibox.layout.flex.horizontal()
+        local title = awful.titlebar.widget.titlewidget(c)
+        title:set_align("center")
+        middle_layout:add(title)
+        middle_layout:buttons(buttons)
+
+        -- now bring it all together
+        local layout = wibox.layout.align.horizontal()
+        layout:set_right(right_layout)
+        layout:set_middle(middle_layout)
+
+        awful.titlebar(c,{size=16}):set_widget(layout)
+    end
 end)
 
 -- No border for maximized clients
 client.connect_signal("focus",
     function(c)
         if c.maximized_horizontal == true and c.maximized_vertical == true then
-            c.border_width = 0
             c.border_color = beautiful.border_normal
         else
-            c.border_width = beautiful.border_width
             c.border_color = beautiful.border_focus
         end
     end)
@@ -738,7 +789,7 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
                     c.border_width = 0
                 elseif awful.client.floating.get(c) or layout == "floating" then
                     c.border_width = beautiful.border_width
-                elseif #clients == 1 then 
+                elseif #clients == 1 then
                     clients[1].border_width = 0
                     if layout ~= "max" then
                         awful.client.moveresize(0, 0, 2, 0, clients[1])
