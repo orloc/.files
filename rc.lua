@@ -103,7 +103,7 @@ wp_timer:start()
 -- common
 modkey     = "Mod4"
 altkey     = "Mod1"
-terminal   = "xterm"
+terminal   = "uxterm"
 editor     = os.getenv("EDITOR") or "nano" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 
