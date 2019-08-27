@@ -22,14 +22,18 @@ Plugin 'fatih/vim-go'
 Plugin 'tobyS/pdv'
 Plugin 'nsf/gocode', {'rtp': 'vim/'}
 Plugin 'tobyS/vmustache'
+Plugin 'hashivim/vim-terraform'
 Plugin 'ervandew/supertab'
- Plugin 'shawncplus/phpcomplete.vim'
+Plugin 'shawncplus/phpcomplete.vim'
 Plugin 'wookiehangover/jshint.vim'
 Plugin 'sophacles/vim-processing'
 "Plugin 'joonty/vim-phpqa.git'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'peitalin/vim-jsx-typescript'
 Plugin 'evidens/vim-twig'
 Plugin 'HTML-AutoCloseTag'
 Plugin 'jewes/Conque-Shell'
+Plugin 'chr4/nginx.vim'
 " ================================================
 " All of your Plugins must be added before the following line
 call vundle#end()               " required
@@ -146,3 +150,11 @@ nnoremap <buffer> <C-p> :call pdv#DocumentCurrentLine()<CR>
 
 "NERDTREE
 let NERDTreeShowHidden=1
+
+
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx
+
+" terraform config
+let g:terraform_align=1
+let g:terraform_fmt_on_save=1
+
